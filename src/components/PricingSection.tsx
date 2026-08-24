@@ -1,15 +1,26 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+
 export default function PricingSection() {
   const [prices, setPrices] = useState({ quarterly: '45', annual: '150', lifetime: '399', currency: '$' });
+
   useEffect(() => {
     const fetchSettings = async () => {
       const { data } = await supabase.from('settings').select('price_quarterly, price_annual, price_lifetime, currency').single();
-      if (data) setPrices(data);
+      if (data) {
+        // FIX: Mapping the database columns to the state keys
+        setPrices({
+          quarterly: data.price_quarterly,
+          annual: data.price_annual,
+          lifetime: data.price_lifetime,
+          currency: data.currency
+        });
+      }
     };
     fetchSettings();
   }, []);
+
   return (
     <section id="pricing" className="py-24 px-4 bg-gray-50">
       <div className="container mx-auto">

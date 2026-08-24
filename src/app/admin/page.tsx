@@ -30,7 +30,15 @@ export default function Admin() {
     if (leadsData) setLeads(leadsData);
 
     const { data: priceData } = await supabase.from('settings').select('price_quarterly, price_annual, price_lifetime, currency').single();
-    if (priceData) setPrices(priceData);
+    if (priceData) {
+      // FIX: Mapping the database columns to the state keys
+      setPrices({
+        quarterly: priceData.price_quarterly,
+        annual: priceData.price_annual,
+        lifetime: priceData.price_lifetime,
+        currency: priceData.currency
+      });
+    }
 
     const { data: shotsData } = await supabase.from('screenshots').select('*').order('id', { ascending: true });
     if (shotsData) setScreenshots(shotsData);
@@ -82,7 +90,6 @@ export default function Admin() {
                 <div key={lead.id} className="border border-gray-100 p-5 rounded-2xl bg-gray-50 hover:bg-white transition">
                   <p className="font-bold text-lg text-primary mb-2">{lead.name}</p>
                   <p className="text-gray-600 mb-1">📞 <span dir="ltr" className="font-bold">{lead.phone}</span></p>
-                  {/* إظهار الإيميل في لوحة التحكم */}
                   {lead.email && <p className="text-gray-600 mb-1">📧 <span dir="ltr">{lead.email}</span></p>}
                   <p className="text-gray-600 mb-3">🏪 {lead.store_name || 'لم يحدد'}</p>
                   {lead.message && <p className="bg-white p-3 rounded-xl text-sm text-gray-700 border border-gray-100">"{lead.message}"</p>}
